@@ -1,7 +1,7 @@
 package ru.melonhell.violenceuniverse.server.game.game;
 
-import ru.melonhell.violenceuniverse.server.game.entity.GameEntity;
 import ru.melonhell.violenceuniverse.common.enums.GameResult;
+import ru.melonhell.violenceuniverse.server.game.entity.GameEntity;
 import ru.melonhell.violenceuniverse.server.game.entity.GameRoundEntity;
 import ru.melonhell.violenceuniverse.server.game.items.GameItem;
 

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.melonhell.violenceuniverse.common.packets.ServerboundPacket;
 import ru.melonhell.violenceuniverse.common.packets.serverbound.ServerboundLogOutPacket;
 import ru.melonhell.violenceuniverse.server.session.Session;
-import ru.melonhell.violenceuniverse.common.enums.StageType;
 import ru.melonhell.violenceuniverse.server.stages.AuthStage;
 
 @Component
@@ -15,7 +14,7 @@ public class LogoutInterceptor implements CommandInterceptor {
             return true;
 
         session.setUser(null);
-        session.setStage(StageType.AUTH);
+        session.setStage(AuthStage.class);
         return false;
     }
 }

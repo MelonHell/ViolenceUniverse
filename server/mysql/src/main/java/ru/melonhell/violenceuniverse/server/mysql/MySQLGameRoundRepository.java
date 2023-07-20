@@ -20,23 +20,39 @@ public class MySQLGameRoundRepository implements GameRoundRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
-    public GameRoundEntity create(GameRoundEntity entity) {
+    public GameRoundEntity create(String gameId) {
         GeneratedKeyHolder holder = new GeneratedKeyHolder();
-        ItemType botMove = entity.getBotMove();
-        ItemType playerMove = entity.getPlayerMove();
-        jdbcTemplate.update("INSERT INTO rounds (game_id, bot_move, player_move, result)\n" +
-                        "VALUES (:game_id, :bot_move, :player_move, :result)",
+        jdbcTemplate.update("INSERT INTO rounds (game_id)\n" +
+                        "VALUES (:game_id)",
                 new MapSqlParameterSource()
-                        .addValue("game_id", entity.getGameId())
-                        .addValue("bot_move", botMove != null ? botMove.name() : null)
-                        .addValue("player_move", playerMove != null ? playerMove.name() : null)
-                        .addValue("result", entity.getResult().name()),
+                        .addValue("game_id", gameId),
                 holder
         );
 
-        entity.setId(Objects.toString(holder.getKey().intValue()));
 
-        return entity;
+        String id = Objects.toString(holder.getKey().intValue());
+
+        return GameRoundEntity.builder()
+                .id(id)
+                .gameId(gameId)
+                .timer(0)
+                .build();
+    }
+
+    @Override
+    public void update(GameRoundEntity entity) {
+        ItemType botMove = entity.getBotMove();
+        ItemType playerMove = entity.getPlayerMove();
+        GameResult result = entity.getResult();
+        jdbcTemplate.update(
+                "UPDATE rounds SET bot_move = :bot_move, player_move = :player_move, result = :result, timer = :timer where id = :id",
+                new MapSqlParameterSource()
+                        .addValue("id", entity.getId())
+                        .addValue("bot_move", botMove != null ? botMove.code() : null)
+                        .addValue("player_move", playerMove != null ? playerMove.code() : null)
+                        .addValue("result", result != null ? result.name() : null)
+                        .addValue("timer", entity.getTimer())
+        );
     }
 
     @Override
@@ -44,9 +60,10 @@ public class MySQLGameRoundRepository implements GameRoundRepository {
         return jdbcTemplate.query("SELECT * FROM rounds where game_id = :id", Map.of("id", gameId), (row, num) -> GameRoundEntity.builder()
                 .id(row.getString("id"))
                 .gameId(gameId)
-                .botMove(ItemType.valueOf(row.getString("bot_move")))
-                .playerMove(ItemType.valueOf(row.getString("player_move")))
-                .result(GameResult.valueOf(row.getString("result")))
+                .timer(row.getInt("timer"))
+                .botMove(ItemType.ofCode(row.getString("bot_move")))
+                .playerMove(ItemType.ofCode(row.getString("player_move")))
+                .result(GameResult.valueOfNullable(row.getString("result")))
                 .build());
     }
 }

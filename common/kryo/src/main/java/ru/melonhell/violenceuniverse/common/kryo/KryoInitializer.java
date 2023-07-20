@@ -26,6 +26,7 @@ public class KryoInitializer {
         kryo.register(ServerboundSignInPacket.class);
         kryo.register(ServerboundSignUpPacket.class);
         kryo.register(ServerboundStartPacket.class);
+        kryo.register(ServerboundAskTimerPacket.class);
         // Enums
         kryo.register(GameResult.class);
         kryo.register(ItemType.class);

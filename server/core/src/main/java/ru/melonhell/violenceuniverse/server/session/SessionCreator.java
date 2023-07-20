@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.melonhell.violenceuniverse.server.session.commandInterceptor.CommandInterceptor;
 import ru.melonhell.violenceuniverse.server.session.port.Transport;
-import ru.melonhell.violenceuniverse.common.enums.StageType;
+import ru.melonhell.violenceuniverse.server.stages.AuthStage;
 import ru.melonhell.violenceuniverse.server.stages.StageService;
 
 import java.util.List;
@@ -19,7 +19,8 @@ public class SessionCreator {
         Session session = new Session(
                 stageService,
                 transport,
-                stageService.getByType(StageType.AUTH)
+                stageService.getByClass(AuthStage.class),
+                null
         );
 
         for (CommandInterceptor interceptor : interceptors) {

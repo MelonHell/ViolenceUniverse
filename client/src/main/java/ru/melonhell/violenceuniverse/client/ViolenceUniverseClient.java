@@ -61,11 +61,15 @@ public class ViolenceUniverseClient {
                         commandCheck(line, 1, "scissors");
                         client.sendTCP(new ServerboundMovePacket(ItemType.SCISSORS));
                     }
+                    case "timer" -> {
+                        commandCheck(line, 1, "timer");
+                        client.sendTCP(new ServerboundAskTimerPacket());
+                    }
 
                     default -> throw new IllegalStateException("Команда " + command + " не найдена");
                 }
             } catch (IllegalStateException e) {
-                System.out.println("Произошла ошибка: " + e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -104,7 +108,7 @@ public class ViolenceUniverseClient {
                     case MENU -> System.out.println("Добро пожаловать в меню. Напишите start чтобы начать игру");
                     case GAME -> System.out.println("Вы вошли в игру");
                 }
-            } else if (o instanceof ClientboundUserSkipMovePacket packet) {
+            } else if (o instanceof ClientboundUserSkipMovePacket) {
                 System.out.println("Ты пропустил ход, и проиграл раунд");
             }
         }
@@ -112,6 +116,7 @@ public class ViolenceUniverseClient {
         @Override
         public void disconnected(Connection connection) {
             System.out.println("Вы отключены от сервера");
+            System.exit(0);
         }
     }
 }

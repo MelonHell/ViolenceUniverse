@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import ru.melonhell.violenceuniverse.common.enums.StageType;
 import ru.melonhell.violenceuniverse.common.packets.ClientboundPacket;
 import ru.melonhell.violenceuniverse.common.packets.ServerboundPacket;
 import ru.melonhell.violenceuniverse.common.packets.clientbound.ClientboundServerErrorPacket;
@@ -12,8 +13,8 @@ import ru.melonhell.violenceuniverse.server.session.commandInterceptor.CommandIn
 import ru.melonhell.violenceuniverse.server.session.exceptions.InvalidControllerTypeException;
 import ru.melonhell.violenceuniverse.server.session.port.Transport;
 import ru.melonhell.violenceuniverse.server.session.stage.LeaveReason;
+import ru.melonhell.violenceuniverse.server.session.stage.NoDataStage;
 import ru.melonhell.violenceuniverse.server.session.stage.Stage;
-import ru.melonhell.violenceuniverse.common.enums.StageType;
 import ru.melonhell.violenceuniverse.server.stages.StageService;
 import ru.melonhell.violenceuniverse.server.user.entity.User;
 
@@ -23,6 +24,7 @@ import java.util.PriorityQueue;
 public class Session {
     private final StageService stageService;
     private final Transport transport;
+    @SuppressWarnings("rawtypes")
     @NotNull
     @Getter
     private Stage stage;
@@ -43,10 +45,11 @@ public class Session {
     private boolean destroyMarker;
     private final PriorityQueue<CommandInterceptor> globalInterceptors = new PriorityQueue<>(Comparator.comparingInt(CommandInterceptor::priority));
 
-    public Session(
+    public <T> Session(
             StageService stageService,
             Transport transport,
-            @NonNull Stage initStage
+            @NonNull Stage<T> initStage,
+            T data
     ) {
         this.stageService = stageService;
         this.transport = transport;
@@ -55,7 +58,8 @@ public class Session {
         transport.addDisconnectCallback(this::destroy);
 
 
-        this.stage.onEnter(this);
+        //noinspection unchecked
+        this.stage.onEnter(this, data);
     }
 
     public void sendPacket(ClientboundPacket packet) {
@@ -101,20 +105,30 @@ public class Session {
         }
     }
 
-    public void setStage(@NotNull Stage stage) {
+    public <T> void setStage(@NotNull Stage<T> stage, T data) {
         if (destroyed)
             return;
         this.stage.onLeave(this, LeaveReason.CHANGE_CONTROLLER);
         this.stage = stage;
-        this.stage.onEnter(this);
+        stage.onEnter(this, data);
+    }
+    public <T extends Stage<D>,D> void setStage(@NotNull Class<T> stage, D data) {
+        T stageStage = stageService.getByClass(stage);
+        setStage(stageStage,data);
     }
 
-    public void setStage(StageType type) {
+    public void setStage(StageType type, Object data) {
         Stage stage = stageService.getByType(type);
         if (stage == null)
             throw new InvalidControllerTypeException();
 
-        setStage(stage);
+        setStage(stage, data);
+    }
+
+    public void setStage(Class<? extends NoDataStage> stage) {
+        NoDataStage stageStage = stageService.getByClass(stage);
+
+        setStage(stageStage, null);
     }
 
     public void addGlobalInterceptor(CommandInterceptor consumer) {

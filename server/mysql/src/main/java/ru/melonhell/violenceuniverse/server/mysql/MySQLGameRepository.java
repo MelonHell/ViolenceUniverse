@@ -7,8 +7,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.melonhell.violenceuniverse.server.game.entity.GameEntity;
 import ru.melonhell.violenceuniverse.common.enums.GameResult;
+import ru.melonhell.violenceuniverse.server.game.entity.GameEntity;
 import ru.melonhell.violenceuniverse.server.game.repository.GameRepository;
 
 import java.util.Map;

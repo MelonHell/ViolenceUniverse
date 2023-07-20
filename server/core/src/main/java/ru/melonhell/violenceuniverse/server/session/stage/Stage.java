@@ -5,11 +5,11 @@ import ru.melonhell.violenceuniverse.common.packets.ServerboundPacket;
 import ru.melonhell.violenceuniverse.common.packets.clientbound.ClientboundStageChangePacket;
 import ru.melonhell.violenceuniverse.server.session.Session;
 
-public interface Stage {
+public interface Stage<T> {
     /**
      * Сессия переключилась на этот контроллер
      */
-    default void onEnter(Session session) {
+    default void onEnter(Session session, T data) {
         session.sendPacket(new ClientboundStageChangePacket(type()));
     }
 

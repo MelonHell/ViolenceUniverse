@@ -13,6 +13,7 @@ import ru.melonhell.violenceuniverse.common.enums.ItemType;
 public class GameRoundEntity {
     private String id;
     private String gameId;
+    private int timer;
     @Nullable
     private ItemType botMove;
     @Nullable

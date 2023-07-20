@@ -1,6 +1,7 @@
 package ru.melonhell.violenceuniverse.server.game.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import ru.melonhell.violenceuniverse.server.game.entity.GameEntity;
 import ru.melonhell.violenceuniverse.server.game.entity.GameRoundEntity;
@@ -23,23 +24,18 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameRoundRepository gameRoundRepository;
 
-    public boolean hasUnfinishedGame(User user) {
-        GameEntity entity = gameRepository.findNotFinishedGame(user.getId());
-
-        return entity != null;
+    @Nullable
+    public GameEntity findUnfinishedGame(User user) {
+        return gameRepository.findNotFinishedGame(user.getId());
     }
 
-    public Game createGame(User user) {
-        GameEntity notFinishedGame = gameRepository.findNotFinishedGame(user.getId());
-        if (notFinishedGame == null)
-            return createNewGame(user);
+    public Game createGame(User user, GameEntity gameEntity) {
+        List<GameRoundEntity> rounds = gameRoundRepository.findRoundsByGame(gameEntity.getId());
 
-        List<GameRoundEntity> rounds = gameRoundRepository.findRoundsByGame(notFinishedGame.getId());
-
-        return createGame(user, notFinishedGame, rounds);
+        return createGame(user, gameEntity, rounds);
     }
 
-    private Game createNewGame(User user) {
+    public Game createNewGame(User user) {
         GameEntity gameEntity = gameRepository.create(user.getId());
 
         return createGame(user, gameEntity, new ArrayList<>(3));

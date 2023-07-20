@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS rounds
 (
     id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     game_id     INT NOT NULL,
+    timer       INT NOT NULL DEFAULT 0,
     bot_move    VARCHAR(12),
     player_move VARCHAR(12),
     result      VARCHAR(10),
